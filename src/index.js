@@ -69,10 +69,9 @@ const styles = {
     justifyContent: 'center',
     position: 'absolute',
     paddingLeft: 10,
-    bottom: -30,
-    left: 0,
+    bottom: 0,
+    right: 10,
     flexWrap: 'nowrap',
-    width: 250,
     backgroundColor: 'transparent'
   },
 
@@ -80,7 +79,7 @@ const styles = {
     backgroundColor: 'transparent',
     flexDirection: 'row',
     position: 'absolute',
-    top: 0,
+    top: -15,
     left: 0,
     flex: 1,
     paddingHorizontal: 10,
@@ -91,7 +90,7 @@ const styles = {
 
   buttonText: {
     fontSize: 50,
-    color: '#007aff',
+    color: '#fff',
     fontFamily: 'Arial'
   }
 }
@@ -462,11 +461,11 @@ export default class extends Component {
     if (state.dir === 'x') x = diff * state.width
     if (state.dir === 'y') y = diff * state.height
 
-    if (Platform.OS !== 'ios') {
-      this.scrollView && this.scrollView[animated ? 'setPage' : 'setPageWithoutAnimation'](diff)
-    } else {
+    // if (Platform.OS !== 'ios') {
+    //   this.scrollView && this.scrollView[animated ? 'setPage' : 'setPageWithoutAnimation'](diff)
+    // } else {
       this.scrollView && this.scrollView.scrollTo({ x, y, animated })
-    }
+    // }
 
     // update scroll state
     this.internals.isScrolling = true
@@ -573,7 +572,7 @@ export default class extends Component {
 
     if (this.props.loop ||
       this.state.index !== this.state.total - 1) {
-      button = this.props.nextButton || <Text style={styles.buttonText}>›</Text>
+      button = this.props.nextButton || <Text style={[styles.buttonText, { width: 30, right: -10 }]}>›</Text>
     }
 
     return (
@@ -637,14 +636,17 @@ export default class extends Component {
        )
     }
     return (
-      <ViewPagerAndroid ref={this.refScrollView}
-        {...this.props}
-        initialPage={this.props.loop ? this.state.index + 1 : this.state.index}
-        onPageSelected={this.onScrollEnd}
-        key={pages.length}
-        style={[styles.wrapperAndroid, this.props.style]}>
+      <ScrollView ref={this.refScrollView}
+                  {...this.props}
+                  {...this.scrollViewPropOverrides()}
+                  contentContainerStyle={[styles.wrapperIOS, this.props.style]}
+                  contentOffset={this.state.offset}
+                  onScrollBeginDrag={this.onScrollBegin}
+                  onMomentumScrollEnd={this.onScrollEnd}
+                  onScrollEndDrag={this.onScrollEndDrag}
+                  style={this.props.scrollViewStyle}>
         {pages}
-      </ViewPagerAndroid>
+      </ScrollView>
     )
   }
 
